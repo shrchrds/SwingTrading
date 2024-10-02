@@ -37,11 +37,11 @@ if option == 'Trading':
     st.markdown("### Overview of Trading Indicators")
     
     # Fetch hourly data for trading (use interval='1h')
-    etf_data = get_etf_data(etf_codes, interval='1h', period='1mo')
+    etf_data = get_etf_data(etf_codes, interval='1h', period='3mo')
     
     # Calculate indicators for the last available hourly data
     for etf, df in etf_data.items():
-        etf_data[etf] = calculate_indicators(df, window_rsi=14, window_dma=20)
+        etf_data[etf] = calculate_indicators(df, window_rsi=14, window_dma=200)
 
     # Display the dashboard using the last available data
     trading_dashboard(etf_data, etf_codes)
