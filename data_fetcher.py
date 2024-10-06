@@ -1,17 +1,20 @@
 import yfinance as yf
-import pandas as pd
 
-def get_etf_data(etf_list, interval='1d', period='1y'):
+def get_etf_data(etf_codes, interval='1d', period='1y', last_trading_day=False):
     """
-    Fetch historical data for a list of ETFs.
+    Fetch ETF data using yfinance.
     Args:
-        etf_list (list): List of ETF ticker symbols.
-        interval (str): Data interval ('1d' for daily, '1h' for hourly).
-        period (str): Data period (e.g., '1y' for 1 year).
+        etf_codes (list): List of ETF symbols.
+        interval (str): Data interval.
+        period (str): Data period.
+        last_trading_day (bool): Whether to fetch data up to the last trading day.
     Returns:
-        dict: Dictionary with ETF symbols as keys and dataframes as values.
+        dict: Dictionary of DataFrames for each ETF.
     """
     etf_data = {}
-    for etf in etf_list:
-        etf_data[etf] = yf.download(etf, interval=interval, period=period)
+    for etf in etf_codes:
+        df = yf.download(etf, interval=interval, period=period)
+        if last_trading_day:
+            df = df[df.index <= df.index.max()]  # Ensure data is up to the last trading day
+        etf_data[etf] = df
     return etf_data
