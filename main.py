@@ -30,33 +30,33 @@ def main():
         'SILVERBEES.NS', 'MONQ50.NS', 'ESG.NS', 'MON100.NS'
     ]
 
-    # Fetch data once and reuse
-    etf_data_hourly = get_etf_data(etf_codes, interval='1h', period='3mo')
-    etf_data_daily = get_etf_data(etf_codes, interval='1d', period='1y', last_trading_day=True)
-
     if option == 'EligibleTradingETFs':
         st.title("Eligible Trading ETFs")
-        for etf, df in etf_data_hourly.items():
-            etf_data_hourly[etf] = calculate_indicators(df, window_rsi=14, window_dma=20)
-        eligible_trading_sidebar(etf_data_hourly, etf_codes)
+        etf_data = get_etf_data(etf_codes, interval='1h', period='3mo')
+        for etf, df in etf_data.items():
+            etf_data[etf] = calculate_indicators(df, window_rsi=14, window_dma=20)
+        eligible_trading_sidebar(etf_data, etf_codes)
 
     elif option == 'EligibleInvestingETFs':
         st.title("Eligible Investing ETFs")
-        for etf, df in etf_data_daily.items():
-            etf_data_daily[etf] = calculate_daily_indicators(df, window_rsi=14, window_dma=200)
-        eligible_investing_sidebar(etf_data_daily, etf_codes)
+        etf_data = get_etf_data(etf_codes, interval='1d', period='1y', last_trading_day=True)
+        for etf, df in etf_data.items():
+            etf_data[etf] = calculate_daily_indicators(df, window_rsi=14, window_dma=200)
+        eligible_investing_sidebar(etf_data, etf_codes)
 
     elif option == 'TakeTrade':
         st.title("Take Trade")
-        for etf, df in etf_data_hourly.items():
-            etf_data_hourly[etf] = calculate_indicators(df, window_rsi=14, window_dma=200)
-        take_trade_sidebar(etf_data_hourly, etf_codes)
+        etf_data = get_etf_data(etf_codes, interval='1h', period='3mo')
+        for etf, df in etf_data.items():
+            etf_data[etf] = calculate_indicators(df, window_rsi=14, window_dma=200)
+        take_trade_sidebar(etf_data, etf_codes)
 
     elif option == 'DoInvestment':
         st.title("Do Investment")
-        for etf, df in etf_data_daily.items():
-            etf_data_daily[etf] = calculate_daily_indicators(df, window_rsi=14, window_dma=200)
-        do_investment_sidebar(etf_data_daily, etf_codes)
+        etf_data = get_etf_data(etf_codes, interval='1d', period='1y')
+        for etf, df in etf_data.items():
+            etf_data[etf] = calculate_daily_indicators(df, window_rsi=14, window_dma=200)
+        do_investment_sidebar(etf_data, etf_codes)
 
     if is_within_trading_time():
         st.success("The market is currently open. Data is up-to-date with the latest trading hour.")
