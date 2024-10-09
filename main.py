@@ -1,21 +1,26 @@
 import streamlit as st
-from datetime import datetime, time
+from datetime import datetime, time, timedelta
 from data_fetcher import get_etf_data
 from indicators import calculate_indicators, calculate_daily_indicators
 from dashboard import eligible_trading_sidebar, eligible_investing_sidebar, take_trade_sidebar, do_investment_sidebar
+from journal import update_journal, check_and_update_sell
+import pytz
 
-# Define the trading hours for the specific window (2:30 PM - 3:20 PM IST)
-market_open = time(9, 15)
-market_close = time(15, 20)
+# Define the trading hours for the specific window (2:30 PM - 3:15 PM IST)
+market_open = time(14, 30)
+market_close = time(23, 15)
+
+# Define the IST timezone
+ist_timezone = pytz.timezone('Asia/Kolkata')
 
 def is_within_trading_time():
     """Check if the current time is within the trading window."""
-    now = datetime.now().time()
-    return market_open <= now <= market_close
+    current_time_ist = datetime.now(ist_timezone).time()
+    return market_open <= current_time_ist <= market_close
 
 def main():
     st.sidebar.title("ETF Dashboard Navigation")
-    option = st.sidebar.radio("Select Dashboard", ('EligibleTradingETFs', 'EligibleInvestingETFs', 'TakeTrade', 'DoInvestment'))
+    option = st.sidebar.radio("Select Dashboard", ('EligibleTradingETFs', 'EligibleInvestingETFs', 'TakeTrade', 'DoInvestment', 'CheckSellConditions'))
 
     etf_codes = [
         'CPSEETF.NS', 'GOLDBEES.NS', 'LOWVOLIETF.NS', 'ALPHAETF.NS', 
@@ -48,15 +53,26 @@ def main():
         st.title("Take Trade")
         etf_data = get_etf_data(etf_codes, interval='1h', period='3mo')
         for etf, df in etf_data.items():
-            etf_data[etf] = calculate_indicators(df, window_rsi=14, window_dma=200)
-        take_trade_sidebar(etf_data, etf_codes)
+            etf_data[etf] = calculate_indicators(df, window_rsi=14, window_dma=20)
+        selected_etf = take_trade_sidebar(etf_data, etf_codes)
+        if selected_etf:
+            update_journal(selected_etf, 'trade')
 
     elif option == 'DoInvestment':
         st.title("Do Investment")
         etf_data = get_etf_data(etf_codes, interval='1d', period='1y')
         for etf, df in etf_data.items():
             etf_data[etf] = calculate_daily_indicators(df, window_rsi=14, window_dma=200)
-        do_investment_sidebar(etf_data, etf_codes)
+        selected_etf = do_investment_sidebar(etf_data, etf_codes)
+        if selected_etf:
+            update_journal(selected_etf, 'investment')
+
+    elif option == 'CheckSellConditions':
+        st.title("Check Sell Conditions")
+        etf_data = get_etf_data(etf_codes, interval='1d', period='1y')
+        for etf, df in etf_data.items():
+            check_and_update_sell(df, etf, 'trade')
+            check_and_update_sell(df, etf, 'investment')
 
     if is_within_trading_time():
         st.success("The market is currently open. Data is up-to-date with the latest trading hour.")

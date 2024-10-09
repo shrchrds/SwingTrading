@@ -2,7 +2,7 @@ import yfinance as yf
 import pandas as pd
 import streamlit as st
 
-@st.cache_data(ttl=900)  # Cache expires every 3600 seconds (1 hour)
+@st.cache_data(ttl=900)  # Cache expires every 900 seconds (15 minutes)
 def get_etf_data(etf_codes, interval='1h', period='3mo', last_trading_day=False):
     """
     Fetch historical data for a list of ETFs.

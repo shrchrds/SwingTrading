@@ -2,3 +2,5 @@ yfinance
 pandas
 ta
 streamlit
+openpyxl
+pytz

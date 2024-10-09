@@ -1,15 +1,18 @@
 import yfinance as yf
+import pandas as pd
+import streamlit as st
 
-def get_etf_data(etf_codes, interval='1d', period='1y', last_trading_day=False):
+@st.cache_data(ttl=900)  # Cache expires every 3600 seconds (1 hour)
+def get_etf_data(etf_codes, interval='1h', period='3mo', last_trading_day=False):
     """
-    Fetch ETF data using yfinance.
+    Fetch historical data for a list of ETFs.
     Args:
-        etf_codes (list): List of ETF symbols.
-        interval (str): Data interval.
-        period (str): Data period.
-        last_trading_day (bool): Whether to fetch data up to the last trading day.
+        etf_list (list): List of ETF ticker symbols.
+        interval (str): Data interval ('1d' for daily, '1h' for hourly).
+        period (str): Data period (e.g., '3mo' for 3 months).
+        last_trading_day (bool): If True, fetch data up to the last trading day.
     Returns:
-        dict: Dictionary of DataFrames for each ETF.
+        dict: Dictionary with ETF symbols as keys and dataframes as values.
     """
     etf_data = {}
     for etf in etf_codes:

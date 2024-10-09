@@ -12,7 +12,7 @@ def calculate_indicators(data, window_rsi=14, window_dma=20):
         pd.DataFrame: DataFrame with added RSI and 20 DMA columns.
     """
     # Calculate RSI using the 'ta' library
-    data['RSI'] = ta.momentum.RSIIndicator(close=data['Close'], window=window_rsi).rsi().round(0)
+    data['RSI'] = ta.momentum.RSIIndicator(close=data['Close'], window=window_rsi).rsi().round(2)
     # Calculate 20 DMA
     data['20 DMA'] = data['Close'].rolling(window_dma).mean().round(2)
     # Calculate % Change from 20 DMA
@@ -30,7 +30,7 @@ def calculate_daily_indicators(data, window_rsi=14, window_dma=200):
         pd.DataFrame: DataFrame with added RSI and 200 DMA columns.
     """
     # Calculate RSI using the 'ta' library
-    data['RSI'] = ta.momentum.RSIIndicator(close=data['Close'], window=window_rsi).rsi().round(0)
+    data['RSI'] = ta.momentum.RSIIndicator(close=data['Close'], window=window_rsi).rsi().round(2)
     # Calculate 200 DMA
     data['200 DMA'] = data['Close'].rolling(window_dma).mean().round(2)
     # Calculate % Change from 200 DMA
